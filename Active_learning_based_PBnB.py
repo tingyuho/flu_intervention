@@ -1,14 +1,15 @@
+import pickle
 import subprocess, sys, os, shutil
 import multiprocessing as mp
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
-import csv
 from gplearn.genetic import SymbolicRegressor
 from pyDOE import *
 from contextlib import contextmanager
 from sklearn import preprocessing
 from sklearn.ensemble import RandomForestRegressor
+import os
+import shutil
 from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
 
@@ -26,11 +27,13 @@ def suppress_stdout():
 
 
 def flu_simulation(name_config): # running flu simulation in cmd
-    print("running flu_simulation:  " + name_config)
-    #FNULL = open(os.devnull, 'w')
-    #p = subprocess.Popen(r'flute '+name_config, cwd=r'C:\Users\TingYu Ho\PycharmProjects\SybolicRegression\gplearn_sr', stdout=FNULL, stderr=subprocess.STDOUT)
-    p = subprocess.Popen(r'flute ' + name_config,
-                         cwd=r'C:\Users\TingYu Ho\PycharmProjects\SybolicRegression\gplearn_sr')
+    _DIREPATH_ = os.getcwd()
+    _CONFIG_DIR_ = os.path.join(_DIREPATH_,'raw_data_flu')
+    #print("running flu_simulation:  " + name_config)
+    FNULL = open(os.devnull, 'w')
+    p = subprocess.Popen(r'flute '+name_config, cwd=_CONFIG_DIR_, stdout=FNULL, stderr=subprocess.STDOUT)
+    #p = subprocess.Popen(r'flute ' + name_config,
+    #                     cwd=_cwd_)
     # p = subprocess.Popen(r'flute config-twodose', cwd=r'C:\Users\TingYu Ho\Google Drive\Research paper\Flu\FluTE-origin')
     # Wait for calling function to terminate
     p_status = p.wait()
@@ -49,18 +52,37 @@ def multiprocess(list_configs): # implement parallel multiprocess
 
 if __name__ == "__main__":
 
+    _DIREPATH_ = os.getcwd()
+
+    _DATA_ = os.path.join(_DIREPATH_, 'raw_data_flu')
+    _RESULT_ = os.path.join(_DIREPATH_, 'results')
+
+    cost_file_name = 'insurer_cost_summary.csv'
+    fit_file_name = 'subspace_fit_function.csv'
+    conf_origin_name = 'config-Seattle-origin-root'
+    config_origin_test_name = 'config-highrisk'
+
+    _COST_FILE_DIR_ = os.path.join(_RESULT_, cost_file_name)
+    _FIT_FILE_DIR_ = os.path.join(_RESULT_, fit_file_name)
+    _CONFIG_ORIGIN_FILE_DIR = os.path.join(_DATA_, config_origin_test_name)
+    _CONFIG_test_FILE_DIR = os.path.join(_DATA_, config_origin_test_name)
+
     # remove existing file
-    if os.path.exists("insurer_cost_summary.csv"): os.remove("insurer_cost_summary.csv")
-    if os.path.exists("subspace_fit_function.csv"): os.remove("subspace_fit_function.csv")
+    if os.path.exists(_COST_FILE_DIR_): os.remove(_COST_FILE_DIR_)
+    if os.path.exists(_FIT_FILE_DIR_): os.remove(_FIT_FILE_DIR_)
+
+    if os.path.exists(os.path.join(_DATA_, cost_file_name)): os.remove(os.path.join(_DATA_, cost_file_name))
+    f_result = open(_COST_FILE_DIR_, "w+")
+    f_result.close()
 
     # setting
+    Figure = True
     Nsampling = 100 # number of sampling points for each subregion
-    rangeReimbursment, rangeCostSharing = [0, 20], [0, 0.5]
-    Partition_R_threshold = 0.99
+    rangeReimbursment, rangeCostSharing = [0, 50], [0, 1]
+    Partition_R_threshold = 0.8
     nReimbursementPartition = nCostSharingPartition = 0
     function_set = ['add', 'sub', 'mul', 'div', 'sqrt', 'log', 'abs', 'neg', 'inv', 'max', 'min']
-    conf_origin = 'config-Seattle-origin-root'
-    config_origin_test = 'config-highrisk'
+
 
     # initialize dataframe of subspaces
     column_names = ['rbmt_min','rbmt_max','cs_min','cs_max','Nsmapling','activate',\
@@ -101,16 +123,15 @@ if __name__ == "__main__":
                     list_configure = []
 
                     for point in x:
-
-
                         conf_name = 'config-Seattle-'+str(point[0])+'-'+str(point[1])+'_file'
-                        f = open(conf_name, "w+")
+                        _COST_FILE_NAME_DIR_ = os.path.join(_DATA_, conf_name)
+                        f = open(_COST_FILE_NAME_DIR_, "w+")
                         f.close()
 
-                        shutil.copy(conf_origin, conf_name)
+                        shutil.copy(_CONFIG_ORIGIN_FILE_DIR, _COST_FILE_NAME_DIR_)
 
                         # insert tje configuration setting
-                        f = open(conf_name, "a+")
+                        f = open(_COST_FILE_NAME_DIR_, "a+")
 
                         #f.write("label " + "example-minimal\n")
                         #f.write("datafile one\n")
@@ -134,14 +155,14 @@ if __name__ == "__main__":
                     print("step 3: Parallel computing Flute and write to csv file")
 
                     multiprocess(list_configure)
+                    shutil.copyfile(os.path.join(_DATA_, cost_file_name), _COST_FILE_DIR_)
 
         """
         step 4: Read the csv file, apply active learning, and get the symbolic Symbolic regression function 
         """
         print("step 4: Read the csv file, apply active learning, and get the symbolic Symbolic regression function ")
-        file = "insurer_cost_summary.csv"
-        df_input_response = pd.read_csv(file, index_col=False)
-        print(df_input_response.columns.values)
+
+        df_input_response = pd.read_csv(_COST_FILE_DIR_, index_col=False)
 
         #df_input_response['total_intervention_cost'] = df_input_response['total_intervention_cost'].apply(lambda x: round(x/float(1000000000),6))
 
@@ -172,16 +193,22 @@ if __name__ == "__main__":
 
                 #X_processed = df_input_response_train_normalized_x[['reimbursement','cost_sharing']].values.tolist()
                 #y_processed = df_input_response_train['total_intervention_cost'].values.tolist()
-                print('X_train:')
-                print(X_train)
-                print('y_train')
-                print(y_train)
+                #print('X_train:')
+                #print(X_train)
+                #print('y_train')
+                #print(y_train)
 
                 """
-                # random forest prediction
+                # random forest prediction and save
                 """
                 regr = RandomForestRegressor(max_depth=3, random_state=0, n_estimators=100)
                 regr.fit(X_train, y_train)
+
+                # save the rf model using rbmt_min and cs_max
+
+                filename = 'rf_fit_model'+'_rbmt_min_'+str(row.rbmt_min)+'_cs_max_'+str(row.cs_max)+'.sav'
+                df_subspaces.loc[ind, 'fit_regressor'] = filename
+                pickle.dump(regr, open(os.path.join(_RESULT_, filename), 'wb'))
 
                 """
                 # symbolic regressor 
@@ -194,24 +221,29 @@ if __name__ == "__main__":
                 print('begin_training')
                 est_gp.fit(X_train, y_train)
                 """
-                df_subspaces.loc[ind, 'cod'] = str(regr.score(X_train, y_train))
+                df_subspaces.loc[ind, 'cod'] = str(regr.score(X_test, y_test))
                 print ("trainging score: "+str(regr.score(X_train, y_train)))
                 print ("testing score: " + str(regr.score(X_test, y_test)))
+
+
                 """
                 plot
                 """
+                if Figure:
+                    x1 = np.arange(row.rbmt_min, row.rbmt_max, (row.rbmt_max-row.rbmt_min) / 50.)
+                    x2 = np.arange(row.cs_min, row.cs_max, (row.cs_max-row.cs_min) / 50.)
+                    x1, x2 = np.meshgrid(x1, x2)
+                    y_regr = regr.predict(np.c_[x1.ravel(), x2.ravel()]).reshape(x1.shape)
 
-                x1 = np.arange(row.rbmt_min, row.rbmt_max, (row.rbmt_max-row.rbmt_min) / 50.)
-                x2 = np.arange(row.cs_min, row.cs_max, (row.cs_max-row.cs_min) / 50.)
-                x1, x2 = np.meshgrid(x1, x2)
-                y_regr = regr.predict(np.c_[x1.ravel(), x2.ravel()]).reshape(x1.shape)
-
-                ax = plt.figure().gca(projection='3d')
-                ax.set_xlim(row.rbmt_min, row.rbmt_max)
-                ax.set_ylim(row.cs_min, row.cs_max)
-                surf = ax.plot_surface(x1, x2, y_regr, rstride=1, cstride=1, color='green', alpha=0.5)
-                points = ax.scatter([X_train[i][0] for i in range(len(X_train))], [X_train[i][1] for i in range(len(X_train))], y_train)
-                plt.show()
+                    ax = plt.figure().gca(projection='3d')
+                    ax.set_xlim(row.rbmt_min, row.rbmt_max)
+                    ax.set_ylim(row.cs_min, row.cs_max)
+                    ax.set_xlabel('reimbursement')
+                    ax.set_ylabel('cost sharing rate')
+                    ax.set_zlabel('total cost')
+                    surf = ax.plot_surface(x1, x2, y_regr, rstride=1, cstride=1, color='green', alpha=0.5)
+                    points = ax.scatter([X_train[i][0] for i in range(len(X_train))], [X_train[i][1] for i in range(len(X_train))], y_train)
+                    plt.show()
 
 
 
@@ -221,7 +253,7 @@ if __name__ == "__main__":
                     #df_subspaces.loc[ind, 'fit_regressor'] = regr
                     print('complete_training')
         df_subspaces.reindex
-        df_subspaces.to_csv('subspace_fit_function.csv', index=False)
+        df_subspaces.to_csv(_FIT_FILE_DIR_, index=False)
         """
         step 5: partition subspace if error rate is too high
         """
