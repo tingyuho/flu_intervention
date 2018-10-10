@@ -65,7 +65,7 @@ if __name__ == "__main__":
     _COST_FILE_DIR_ = os.path.join(_RESULT_, cost_file_name)
     _FIT_FILE_DIR_ = os.path.join(_RESULT_, fit_file_name)
     _CONFIG_ORIGIN_FILE_DIR = os.path.join(_DATA_, config_origin_test_name)
-    _CONFIG_test_FILE_DIR = os.path.join(_DATA_, config_origin_test_name)
+
 
     # remove existing file
     if os.path.exists(_COST_FILE_DIR_): os.remove(_COST_FILE_DIR_)
@@ -76,9 +76,9 @@ if __name__ == "__main__":
     f_result.close()
 
     # setting
-    Figure = True
-    Nsampling = 100 # number of sampling points for each subregion
-    rangeReimbursment, rangeCostSharing = [0, 50], [0, 1]
+    Figure = False
+    Nsampling = 200 # number of sampling points for each subregion
+    rangeReimbursment, rangeCostSharing = [0, 30], [0, 1]
     Partition_R_threshold = 0.8
     nReimbursementPartition = nCostSharingPartition = 0
     function_set = ['add', 'sub', 'mul', 'div', 'sqrt', 'log', 'abs', 'neg', 'inv', 'max', 'min']
@@ -201,7 +201,7 @@ if __name__ == "__main__":
                 """
                 # random forest prediction and save
                 """
-                regr = RandomForestRegressor(max_depth=3, random_state=0, n_estimators=100)
+                regr = RandomForestRegressor(max_depth=6, random_state=0, n_estimators=100)
                 regr.fit(X_train, y_train)
 
                 # save the rf model using rbmt_min and cs_max
