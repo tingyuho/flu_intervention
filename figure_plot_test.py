@@ -10,7 +10,7 @@ from sklearn import preprocessing
 from sklearn.ensemble import RandomForestRegressor
 import os
 from mpl_toolkits.mplot3d import axes3d, Axes3D #<-- Note the capitalization!
-rangeReimbursment, rangeCostSharing = [0, 40], [0, 1]
+rangeReimbursment, rangeCostSharing = [0, 30], [0, 1]
 
 cost_vaccine = 35
 weight_infect = 200
@@ -19,7 +19,7 @@ weight_daed = 1000
 
 _DIREPATH_ = os.getcwd()
 _RESULT_ = os.path.join(_DIREPATH_, 'results')
-cost_file_name = "insurer_cost_summary_case_1.csv"
+cost_file_name = "insurer_cost_summary.csv"
 _COST_FILE_DIR_ = os.path.join(_RESULT_, cost_file_name)
 df_input_response = pd.read_csv(_COST_FILE_DIR_, index_col=False)
 df_input_response = df_input_response.dropna()
@@ -42,7 +42,7 @@ X = df_input_response[['reimbursement','cost_sharing']].values.tolist()
 X_train = X[0:int(len(X)*0.8)]
 X_test = X[int((len(X)*8)/10):len(X)]
 
-figure_list = ['total_intervention_cost', 'Cumulated_Infection', 'N_vaccination', 'N_antivirus', 'Cost_include_vaccine_cost', 'Cost_include_infection_hopsital_death_cost', 'Infection_hopsital_death_cost','Total_cost']
+figure_list = ['total_intervention_cost', 'Cumulated_Infection', 'N_vaccination', 'N_hospitalized', 'N_antivirus', 'Cost_include_vaccine_cost', 'Cost_include_infection_hopsital_death_cost', 'Infection_hopsital_death_cost','Total_cost']
 
 for figure in figure_list:
 

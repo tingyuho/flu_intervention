@@ -232,4 +232,5 @@ class c_SubRegion(object):
 
 if __name__ == "__main__":
     fun_blackbox = fitting_model_function
+    #fun_blackbox = function_flu
     PBnB(fun_blackbox)

@@ -23,7 +23,7 @@ def fitting_model_function(X,r):
 
     df_subspaces = pd.read_csv(_FIT_FILE_DIR_)
 
-    """
+
     df_subspaces_filter = df_subspaces[(x1 >= df_subspaces['rbmt_min']) & (x2 <= df_subspaces['cs_max'])]
     fit_model_name = str(df_subspaces_filter.iloc[-1].fit_regressor)
 
@@ -31,6 +31,7 @@ def fitting_model_function(X,r):
     loaded_model = pickle.load(open(os.path.join(_RESULT_, fit_model_name), 'rb'))
     """
     loaded_model = pickle.load(open(os.path.join(_RESULT_, 'total_intervention_cost.sav'), 'rb'))
+    """
     y = loaded_model.predict([[x1, x2]])
 
     return y

@@ -7,7 +7,7 @@ Created on Fri Jun 23 22:15:00 2017
 
 
 import numpy as np
-f_delta = 0.2
+f_delta = 0.17
 f_alpha = 0.1
 
 i_k_b = 2

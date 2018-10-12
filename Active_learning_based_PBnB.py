@@ -77,7 +77,7 @@ if __name__ == "__main__":
 
     # setting
     Figure = False
-    Nsampling = 200 # number of sampling points for each subregion
+    Nsampling = 100 # number of sampling points for each subregion
     rangeReimbursment, rangeCostSharing = [0, 30], [0, 1]
     Partition_R_threshold = 0.8
     nReimbursementPartition = nCostSharingPartition = 0
@@ -177,11 +177,11 @@ if __name__ == "__main__":
                 X = df_input_response_train_testing[['reimbursement','cost_sharing']].values.tolist()
                 y = df_input_response_train_testing['total_intervention_cost'].values.tolist()
 
-                X_train = X[0:int(len(X)*0.8)]
-                X_test = X[int((len(X)*8)/10):len(X)]
+                X_train = X[0:int(len(X)*0.7)]
+                X_test = X[int((len(X)*3)/10):len(X)]
 
-                y_train = y[0:int(len(y)*0.8)]
-                y_test = y[int((len(y)*8)/10):len(y)]
+                y_train = y[0:int(len(y)*0.7)]
+                y_test = y[int((len(y)*3)/10):len(y)]
 
                 #min_max_scaler = preprocessing.MinMaxScaler()
 

@@ -232,7 +232,7 @@ def plot2D(l_subr, l_ini_coordinate_lower, l_ini_coordinate_upper, i_k):
         )
     fig.savefig('PBnB_plot_iteration ' + str(i_k) + '.png', dpi=200, bbox_inches='tight')
     n_total_sample = 0
-    for c in l_subr:
+    for c in (c for c in l_subr if c.b_activate == True):
         n_total_sample += c.pd_sample_record.shape[0]
     print('Total number of sampleings: ' + str(n_total_sample))
 
