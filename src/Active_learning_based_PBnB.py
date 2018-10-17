@@ -77,9 +77,10 @@ if __name__ == "__main__":
 
     # setting
     Figure = False
-    Nsampling = 100 # number of sampling points for each subregion
+    Nsampling = 400 # number of sampling points for each subregion
     rangeReimbursment, rangeCostSharing = [0, 30], [0, 1]
-    Partition_R_threshold = 0.8
+    _MAX_RF_DEPTH_ = 8
+    Partition_R_threshold = 0.85
     nReimbursementPartition = nCostSharingPartition = 0
     function_set = ['add', 'sub', 'mul', 'div', 'sqrt', 'log', 'abs', 'neg', 'inv', 'max', 'min']
 
@@ -201,7 +202,7 @@ if __name__ == "__main__":
                 """
                 # random forest prediction and save
                 """
-                regr = RandomForestRegressor(max_depth=6, random_state=0, n_estimators=100)
+                regr = RandomForestRegressor(max_depth=_MAX_RF_DEPTH_, random_state=0, n_estimators=100)
                 regr.fit(X_train, y_train)
 
                 # save the rf model using rbmt_min and cs_max

@@ -156,7 +156,7 @@ def PBnB (fun_blackbox): # PBnB(rosenbrock)
         #print pickle.load(f)
         # print the total number of sampleing
         n_total_sample = 0
-        for c in l_subr:
+        for c in (i for i in l_subr if i.b_activate == True):
             n_total_sample += c.pd_sample_record.shape[0]
         print('Total number of sampleings: '+str(n_total_sample))
 
