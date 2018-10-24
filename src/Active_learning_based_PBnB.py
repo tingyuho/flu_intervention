@@ -10,6 +10,7 @@ from sklearn import preprocessing
 from sklearn.ensemble import RandomForestRegressor
 import os
 import shutil
+import argparse
 from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
 
@@ -41,7 +42,7 @@ def flu_simulation(name_config): # running flu simulation in cmd
 
 
 def multiprocess(list_configs): # implement parallel multiprocess
-    pool = mp.Pool(processes=4)
+    pool = mp.Pool(processes=10)
     [pool.apply_async(
             func=flu_simulation,
             args=(config,)
@@ -51,20 +52,34 @@ def multiprocess(list_configs): # implement parallel multiprocess
 
 
 if __name__ == "__main__":
+    ap = argparse.ArgumentParser(description='flute-low-fidelity-model-builder')
+    ap.add_argument('--n_sampling', type=int)
+    ap.add_argument('--rf_depth', type=int)
+    ap.add_argument('--rf_threshold', type=float)
+    ap.add_argument('--scenario', type=str)
+    ap.add_argument('--max_iteration', type=int)
 
+    argv = ap.parse_args()
+    max_iteration = argv.max_iteration
+    scenario = argv.scenario
     _DIREPATH_ = os.getcwd()
 
     _DATA_ = os.path.join(_DIREPATH_, 'raw_data_flu')
     _RESULT_ = os.path.join(_DIREPATH_, 'results')
-
-    cost_file_name = 'insurer_cost_summary.csv'
-    fit_file_name = 'subspace_fit_function.csv'
-    conf_origin_name = 'config-Seattle-origin-root'
-    config_origin_test_name = 'config-highrisk'
+    if scenario == 'test':
+        cost_file_name = 'insurer_cost_summary.csv'
+        fit_file_name = 'subspace_fit_function.csv'
+        conf_origin_name = 'config-Seattle-origin-root'
+        config_origin_test_name = 'config-highrisk'
+    if scenario == 'experiment':
+        cost_file_name = 'insurer_cost_summary_case.csv'
+        fit_file_name = 'subspace_fit_function_case.csv'
+        conf_origin_name = 'config-Seattle-origin-root'
+        config_origin_test_name = 'config-highrisk_case'
 
     _COST_FILE_DIR_ = os.path.join(_RESULT_, cost_file_name)
     _FIT_FILE_DIR_ = os.path.join(_RESULT_, fit_file_name)
-    _CONFIG_ORIGIN_FILE_DIR = os.path.join(_DATA_, config_origin_test_name)
+    _CONFIG_ORIGIN_FILE_DIR = os.path.join(_DATA_, conf_origin_name)
 
 
     # remove existing file
@@ -77,10 +92,10 @@ if __name__ == "__main__":
 
     # setting
     Figure = False
-    Nsampling = 400 # number of sampling points for each subregion
-    rangeReimbursment, rangeCostSharing = [0, 30], [0, 1]
-    _MAX_RF_DEPTH_ = 8
-    Partition_R_threshold = 0.85
+    Nsampling = argv.n_sampling # number of sampling points for each subregion
+    rangeReimbursment, rangeCostSharing = [0, 20], [0, 1]
+    _MAX_RF_DEPTH_ = argv.rf_depth
+    Partition_R_threshold = argv.rf_threshold
     nReimbursementPartition = nCostSharingPartition = 0
     function_set = ['add', 'sub', 'mul', 'div', 'sqrt', 'log', 'abs', 'neg', 'inv', 'max', 'min']
 
@@ -92,8 +107,9 @@ if __name__ == "__main__":
                                        0, True, False, "", None, None]], index=[1], columns=column_names)
 
 
-
-    while True:
+    iteration = 1
+    while iteration < max_iteration:
+        iteration += 1
         """
         step 1: DOE to create the N sampling point
         """

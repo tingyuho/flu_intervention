@@ -9,17 +9,25 @@ from contextlib import contextmanager
 from sklearn import preprocessing
 from sklearn.ensemble import RandomForestRegressor
 import os
+import argparse
+ap = argparse.ArgumentParser(description='flute-low-fidelity-model-builder')
+
+ap.add_argument('--rf_depth', type=int)
+
+argv = ap.parse_args()
+
 from mpl_toolkits.mplot3d import axes3d, Axes3D #<-- Note the capitalization!
-rangeReimbursment, rangeCostSharing = [0, 30], [0, 1]
+rangeReimbursment, rangeCostSharing = [0, 20], [0, 1]
 
 cost_vaccine = 35
 weight_infect = 200
 weight_hospital = 600
 weight_dead = 1000
-_MAX_RF_DEPTH_= 8
+_MAX_RF_DEPTH_= argv.rf_depth
+
 _DIREPATH_ = os.getcwd()
 _RESULT_ = os.path.join(_DIREPATH_, 'results')
-cost_file_name = "insurer_cost_summary.csv"
+cost_file_name = 'insurer_cost_summary-10232018-2.csv'
 _COST_FILE_DIR_ = os.path.join(_RESULT_, cost_file_name)
 df_input_response = pd.read_csv(_COST_FILE_DIR_, index_col=False)
 df_input_response = df_input_response.dropna()

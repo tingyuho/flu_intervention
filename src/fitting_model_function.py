@@ -9,6 +9,8 @@ import os
 import pickle
 
 def fitting_model_function(X,r):
+    R0 =
+    EFFs =
     r = 1
     mu, sigma = 0, 0 # mean and standard deviation
     s = np.random.normal(mu, sigma, r)
@@ -17,7 +19,7 @@ def fitting_model_function(X,r):
 
     _DIREPATH_ = os.getcwd()
 
-    fit_file_name = 'subspace_fit_function.csv'
+    fit_file_name = 'subspace_fit_function_'+'Attack_'+str(R0)+'_Efficacy_'+str(EFFs)+'.csv'
     _RESULT_ = os.path.join(_DIREPATH_, 'results')
     _FIT_FILE_DIR_ = os.path.join(_RESULT_, fit_file_name)
 

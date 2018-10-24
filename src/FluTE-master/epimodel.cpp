@@ -26,7 +26,9 @@ extern "C" {
 #include <iostream> // added by TingYu
 #include <fstream> // added by TingYu
 #include <string> // added by TingYu
+#include <cmath> // added by TingYu
 using namespace std;
+
 
 const int nVersionMajor = 1;
 const int nVersionMinor = 15;
@@ -964,7 +966,10 @@ void EpiModel::create_person(int nAgeGroup, int nFamilySize, int nFamily, int nH
   //p.prob_death = 0; // probability of death add TingYu
   p.prob_unv = 1; // probability of getting infection when not vaccinated
   p.prob_vac = 1; // probability of getting infection when vaccinated
+
   if (isHighRisk(p)){
+    p.indirect_cost_vaccination = 15*get_rand_double+5;
+    if (get_rand_double < 0.01) p.indirect_cost_vaccination = 0;
     if (p.age ==0){
       p.direct_cost_not_medical = 3.0;
       p.indirect_cost_not_medical = 145.0;
@@ -973,7 +978,7 @@ void EpiModel::create_person(int nAgeGroup, int nFamilySize, int nFamily, int nH
 	  p.cost_death = 267954.0;
 	  p.direct_cost_antivirus = 574.0;
 	  p.indirect_cost_antivirus = 870.0;
-	  p.indirect_cost_vaccination = 10;
+
     }
     if (p.age ==1){
       p.direct_cost_not_medical = 3.0;
@@ -983,7 +988,6 @@ void EpiModel::create_person(int nAgeGroup, int nFamilySize, int nFamily, int nH
 	  p.cost_death = 267954.0;
 	  p.direct_cost_antivirus = 649.0;
 	  p.indirect_cost_antivirus = 580.0;
-	  p.indirect_cost_vaccination = 10;
       }
     if (p.age ==2){
       p.direct_cost_not_medical = 3.0;
@@ -993,7 +997,6 @@ void EpiModel::create_person(int nAgeGroup, int nFamilySize, int nFamily, int nH
 	  p.cost_death = 75890.0;
 	  p.direct_cost_antivirus = 725.0;
 	  p.indirect_cost_antivirus = 290.0;
-	  p.indirect_cost_vaccination = 10;
       }
     if (p.age ==3){
       p.direct_cost_not_medical = 3;
@@ -1003,7 +1006,6 @@ void EpiModel::create_person(int nAgeGroup, int nFamilySize, int nFamily, int nH
 	  p.cost_death = 118842;
 	  p.direct_cost_antivirus = 733;
 	  p.indirect_cost_antivirus = 580;
-	  p.indirect_cost_vaccination = 10.0;
       }
     if (p.age ==4){
       p.direct_cost_not_medical = 3;
@@ -1013,10 +1015,11 @@ void EpiModel::create_person(int nAgeGroup, int nFamilySize, int nFamily, int nH
 	  p.cost_death = 33011;
 	  p.direct_cost_antivirus = 476.f;
 	  p.indirect_cost_antivirus = 1015.0;
-	  p.indirect_cost_vaccination = 10.0;
       }
   }
   if (!isHighRisk(p)){
+    p.indirect_cost_vaccination = 15*get_rand_double+5;
+    if (get_rand_double < 0.01) p.indirect_cost_vaccination = 0;
     if (p.age ==0){
       p.direct_cost_not_medical = 3;
 	  p.indirect_cost_not_medical = 145;
@@ -1025,7 +1028,6 @@ void EpiModel::create_person(int nAgeGroup, int nFamilySize, int nFamily, int nH
 	  p.cost_death = 28818;
 	  p.direct_cost_antivirus = 167;
 	  p.indirect_cost_antivirus = 145;
-	  p.indirect_cost_vaccination = 10.0;
       }
     if (p.age ==1){
       p.direct_cost_not_medical = 3;
@@ -1035,7 +1037,6 @@ void EpiModel::create_person(int nAgeGroup, int nFamilySize, int nFamily, int nH
 	  p.cost_death = 28818;
 	  p.direct_cost_antivirus = 95;
 	  p.indirect_cost_antivirus = 145;
-	  p.indirect_cost_vaccination = 10.0;
       }
     if (p.age ==2){
       p.direct_cost_not_medical = 3;
@@ -1045,7 +1046,6 @@ void EpiModel::create_person(int nAgeGroup, int nFamilySize, int nFamily, int nH
 	  p.cost_death = 76336;
 	  p.direct_cost_antivirus = 125;
 	  p.indirect_cost_antivirus = 145;
-	  p.indirect_cost_vaccination = 10.0;
       }
     if (p.age ==3){
       p.direct_cost_not_medical = 3;
@@ -1055,7 +1055,6 @@ void EpiModel::create_person(int nAgeGroup, int nFamilySize, int nFamily, int nH
 	  p.cost_death = 118575;
 	  p.direct_cost_antivirus = 150;
 	  p.indirect_cost_antivirus = 290;
-	  p.indirect_cost_vaccination = 10.0;
       }
     if (p.age ==4){
       p.direct_cost_not_medical = 3.0;
@@ -1065,7 +1064,6 @@ void EpiModel::create_person(int nAgeGroup, int nFamilySize, int nFamily, int nH
 	  p.cost_death = 41948.0;
 	  p.direct_cost_antivirus = 242.0;
 	  p.indirect_cost_antivirus = 435.0;
-	  p.indirect_cost_vaccination = 10.0;
       }
   }
 /*
@@ -2530,7 +2528,7 @@ void EpiModel::travel_start(void) {
  *
  */
  void EpiModel::decisionMaking_vaccination(void) {
-    cout << "decisionMaking_vaccination" << "\n";
+    //cout << "decisionMaking_vaccination" << "\n";
     vector< Community >::iterator cend = commvec.end();
 	vector< Person >::iterator pend=pvec.end();
 	for (vector< Person >::iterator it = pvec.begin();
@@ -2600,7 +2598,7 @@ void EpiModel::travel_start(void) {
  *
  */
  void EpiModel::decisionMaking_antivirus(void) {
-    cout << "decisionMaking_antivirus" << "\n";
+    //cout << "decisionMaking_antivirus" << "\n";
 	vector< Person >::iterator pend=pvec.end();
 	for (vector< Person >::iterator it = pvec.begin();
 	   it != pend;
@@ -2608,15 +2606,16 @@ void EpiModel::travel_start(void) {
 		Person &p = *it;
 		if (!isAntiviral(p) && isInfected(p)){
 			p.cost_notantivirus = (1-p.prob_hospitalization-p.prob_death)*(p.direct_cost_not_medical+p.indirect_cost_not_medical)+p.prob_hospitalization*(0.9*(p.direct_cost_hospitalization)+p.indirect_cost_hospitalization)+p.prob_death*(0.9*p.cost_death);
-			p.cost_antivirus = fCostSharingRate*p.direct_cost_antivirus; //+p.indirect_cost_antivirus
-			cout<<p.prob_hospitalization<< "\n";
+			p.cost_antivirus = fCostSharingRate*p.direct_cost_antivirus+p.indirect_cost_antivirus*0.15;
+			//cout<<p.prob_hospitalization<< "\n";
 			//cout<<p.prob_death<< "\n";
-			cout<<p.cost_notantivirus<< "\n";
-			cout<<p.cost_antivirus<< "\n";
-			cout<<p.indirect_cost_antivirus<< "\n";
-			cout<< "\n";
+			//cout<<p.cost_notantivirus<< "\n";
+			//cout<<p.cost_antivirus<< "\n";
+			//cout<<p.indirect_cost_antivirus<< "\n";
+			//cout<< "\n";
 			if (p.cost_notantivirus >= p.cost_antivirus){
 			    setAntiviral(p);
+			    //cout<< "setAntiviral"<< "\n";
 			    p.everantivirus = 1;
             }
 			//setAntiviral(p);
@@ -4053,13 +4052,19 @@ void EpiModel::prerun(void) {
  *   nRunLength: total number of days requested
  */
 void EpiModel::run(void) {
-  cout << "run" << "\n";
+  //cout << "run" << "\n";
   prerun();
 #ifdef PARALLEL
   sync();
 #endif
   while(nTimer<nRunLength*2) {
-    cout << "run" << nTimer << "\n";
+    //cout << "run" << nTimer << "\n";
+
+    /*for (vector< unsigned int >::iterator it = nNumCumulativeSymptomaticHistory.begin();
+	 it != nNumCumulativeSymptomaticHistory.end();
+	 it++)
+      cout << *it << ",";
+       */
     if (nLogFileInterval>0 && (int)(nTimer/2)%nLogFileInterval==0)
       log();
     if (bSeedDaily) {
