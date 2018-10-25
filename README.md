@@ -1,4 +1,4 @@
-#flu_vaccination #
+**flu_vaccination**
 
 the mathematical and computer models of the spread of infectious disease which is modified based on [FluTE](https://www.cs.unm.edu/~dlchao/flute/) model but given the two insurance-based incentives:
 
@@ -6,6 +6,7 @@ the mathematical and computer models of the spread of infectious disease which i
 2.	outpatient cost-sharing rate
 
 Two low-fidelity model builder are built in this study:
+
 1.	Active learning approach - symbolic regressor
 2.	Machine learning approach - random forest regressor
 
