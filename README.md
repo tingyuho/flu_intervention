@@ -1,4 +1,4 @@
-##flu_vaccination ##
+#flu_vaccination #
 
 the mathematical and computer models of the spread of infectious disease which is modified based on [FluTE](https://www.cs.unm.edu/~dlchao/flute/) model but given the two insurance-based incentives:
 
