@@ -27,7 +27,7 @@ _MAX_RF_DEPTH_= argv.rf_depth
 
 _DIREPATH_ = os.getcwd()
 _RESULT_ = os.path.join(_DIREPATH_, 'results')
-cost_file_name = 'insurer_cost_summary-10232018-2.csv'
+cost_file_name = 'insurer_cost_summary_case4.csv'
 _COST_FILE_DIR_ = os.path.join(_RESULT_, cost_file_name)
 df_input_response = pd.read_csv(_COST_FILE_DIR_, index_col=False)
 df_input_response = df_input_response.dropna()

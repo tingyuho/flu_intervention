@@ -27,12 +27,13 @@ def suppress_stdout():
             sys.stdout = old_stdout
 
 
-def flu_simulation(name_config): # running flu simulation in cmd
+def flu_simulation(case, name_config): # running flu simulation in cmd
     _DIREPATH_ = os.getcwd()
     _CONFIG_DIR_ = os.path.join(_DIREPATH_,'raw_data_flu')
     #print("running flu_simulation:  " + name_config)
     FNULL = open(os.devnull, 'w')
-    p = subprocess.Popen(r'flute '+name_config, cwd=_CONFIG_DIR_, stdout=FNULL, stderr=subprocess.STDOUT)
+    print(name_config)
+    p = subprocess.Popen(r'flute_'+case+' '+name_config, cwd=_CONFIG_DIR_, stdout=FNULL, stderr=subprocess.STDOUT)
     #p = subprocess.Popen(r'flute ' + name_config,
     #                     cwd=_cwd_)
     # p = subprocess.Popen(r'flute config-twodose', cwd=r'C:\Users\TingYu Ho\Google Drive\Research paper\Flu\FluTE-origin')
@@ -41,11 +42,11 @@ def flu_simulation(name_config): # running flu simulation in cmd
 
 
 
-def multiprocess(list_configs): # implement parallel multiprocess
-    pool = mp.Pool(processes=10)
+def multiprocess(case, list_configs): # implement parallel multiprocess
+    pool = mp.Pool(processes=6)
     [pool.apply_async(
             func=flu_simulation,
-            args=(config,)
+            args=(case, config,)
         ) for config in list_configs]
     pool.close()
     pool.join()
@@ -58,10 +59,12 @@ if __name__ == "__main__":
     ap.add_argument('--rf_threshold', type=float)
     ap.add_argument('--scenario', type=str)
     ap.add_argument('--max_iteration', type=int)
+    ap.add_argument('--case', type=str)
 
     argv = ap.parse_args()
     max_iteration = argv.max_iteration
     scenario = argv.scenario
+    case = argv.case
     _DIREPATH_ = os.getcwd()
 
     _DATA_ = os.path.join(_DIREPATH_, 'raw_data_flu')
@@ -72,10 +75,10 @@ if __name__ == "__main__":
         conf_origin_name = 'config-Seattle-origin-root'
         config_origin_test_name = 'config-highrisk'
     if scenario == 'experiment':
-        cost_file_name = 'insurer_cost_summary_case.csv'
-        fit_file_name = 'subspace_fit_function_case.csv'
-        conf_origin_name = 'config-Seattle-origin-root'
-        config_origin_test_name = 'config-highrisk_case'
+        cost_file_name = 'insurer_cost_summary_'+case+'.csv'
+        fit_file_name = 'subspace_fit_function_'+case+'.csv'
+        conf_origin_name = 'config-Seattle-origin-root_'+case
+        config_origin_test_name = 'config-highrisk_'+case
 
     _COST_FILE_DIR_ = os.path.join(_RESULT_, cost_file_name)
     _FIT_FILE_DIR_ = os.path.join(_RESULT_, fit_file_name)
@@ -171,7 +174,7 @@ if __name__ == "__main__":
                     """
                     print("step 3: Parallel computing Flute and write to csv file")
 
-                    multiprocess(list_configure)
+                    multiprocess(case, list_configure)
                     shutil.copyfile(os.path.join(_DATA_, cost_file_name), _COST_FILE_DIR_)
 
         """
@@ -222,8 +225,10 @@ if __name__ == "__main__":
                 regr.fit(X_train, y_train)
 
                 # save the rf model using rbmt_min and cs_max
-
-                filename = 'rf_fit_model'+'_rbmt_min_'+str(row.rbmt_min)+'_cs_max_'+str(row.cs_max)+'.sav'
+                if scenario == 'test':
+                    filename = 'rf_fit_model'+'_rbmt_min_'+str(row.rbmt_min)+'_cs_max_'+str(row.cs_max)+'.sav'
+                if scenario == 'experiment':
+                    filename = 'rf_fit_model'+'_rbmt_min_'+str(row.rbmt_min)+'_cs_max_'+str(row.cs_max)+'_'+case+'.sav'
                 df_subspaces.loc[ind, 'fit_regressor'] = filename
                 pickle.dump(regr, open(os.path.join(_RESULT_, filename), 'wb'))
 
