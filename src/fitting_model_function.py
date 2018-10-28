@@ -9,8 +9,7 @@ import os
 import pickle
 
 def fitting_model_function(X,r):
-    R0 =
-    EFFs =
+
     r = 1
     mu, sigma = 0, 0 # mean and standard deviation
     s = np.random.normal(mu, sigma, r)
@@ -19,17 +18,17 @@ def fitting_model_function(X,r):
 
     _DIREPATH_ = os.getcwd()
 
-    fit_file_name = 'subspace_fit_function_'+'Attack_'+str(R0)+'_Efficacy_'+str(EFFs)+'.csv'
+    # fit_file_name = 'subspace_fit_function_'+'Attack_'+str(R0)+'_Efficacy_'+str(EFFs)+'.csv'
     _RESULT_ = os.path.join(_DIREPATH_, 'results')
-    _FIT_FILE_DIR_ = os.path.join(_RESULT_, fit_file_name)
+    # _FIT_FILE_DIR_ = os.path.join(_RESULT_, fit_file_name)
+    #
+    # df_subspaces = pd.read_csv(_FIT_FILE_DIR_)
+    #
+    #
+    # df_subspaces_filter = df_subspaces[(x1 >= df_subspaces['rbmt_min']) & (x2 <= df_subspaces['cs_max'])]
+    # fit_model_name = str(df_subspaces_filter.iloc[-1].fit_regressor)
 
-    df_subspaces = pd.read_csv(_FIT_FILE_DIR_)
-
-
-    df_subspaces_filter = df_subspaces[(x1 >= df_subspaces['rbmt_min']) & (x2 <= df_subspaces['cs_max'])]
-    fit_model_name = str(df_subspaces_filter.iloc[-1].fit_regressor)
-
-    #fit_model_name = 'rf_fit_model_rbmt_min_0_cs_max_1.sav'
+    fit_model_name = 'Test_Total_cost_weight_280.sav'
     loaded_model = pickle.load(open(os.path.join(_RESULT_, fit_model_name), 'rb'))
     """
     loaded_model = pickle.load(open(os.path.join(_RESULT_, 'total_intervention_cost.sav'), 'rb'))
